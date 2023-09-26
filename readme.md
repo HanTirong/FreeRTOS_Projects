@@ -1,8 +1,7 @@
 ## 本仓库用来记录FreeRTOS学习过程并存储相关代码
-参考视频：
-[https://www.bilibili.com/video/BV1Jw411i7Fz/](URL)
----
 
+###  [参考视频](https://www.bilibili.com/video/BV1Jw411i7Fz/)
+---
 
 ### *2023.9.26*
 1. 搭建软件环境
