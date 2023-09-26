@@ -1,0 +1,14 @@
+# 忽视一个特定文件夹
+01_freertos_template/
+.git/
+SI/
+MDK5/01_freertos_template/Drivers/
+MDK5/01_freertos_template/MDK-ARM/
+
+# 忽视所有 .格式 的文件
+*.bat
+*.ioc
+*.mxproject
+
+# 忽视一个特定文件
+LICENSE
