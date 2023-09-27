@@ -1,5 +1,5 @@
 # 忽视一个特定文件夹
-01_freertos_template/
+01_freertos_template_自建/
 .git/
 SI/
 
@@ -9,8 +9,6 @@ MDK5/*
 MDK5/01_freertos_template/*
 !MDK5/01_freertos_template/Core/
 !MDK5/01_freertos_template/Middlewares/
-
-
 
 # 忽视所有 .格式 的文件
 *.bat

@@ -77,7 +77,11 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-
+void MyTask(void *argument){
+	while(1){
+		Led_Test();
+	}
+}
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void *argument);
@@ -116,6 +120,7 @@ void MX_FREERTOS_Init(void) {
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
+  xTaskCreate(MyTask,"MyTask",128,NULL,osPriorityNormal,NULL);
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_EVENTS */
