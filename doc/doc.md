@@ -1,7 +1,3 @@
-## 本仓库用来记录FreeRTOS学习过程并存储相关代码
----
-###  [参考视频](https://www.bilibili.com/video/BV1Jw411i7Fz/)
----
 ### *2023.9.26*
 1. 搭建软件环境
 2. 学习.gitignore文件编写规则
@@ -66,6 +62,12 @@
     - ***在RTOS中，为什么每个任务都要有自己的栈？*** 因为每个任务都有自己的调用关系、自己的局部变量、在进行调度时要**保存现场**（保存现场：将所有的寄存器的值存入该任务对应的栈中）
 ---
 ### *2023.10.2*  
+#### [4-1] FreeRTOS源码概述FreeRTOS源码概述   
+[参考文档](https://rtos.100ask.net/zh/freeRTOS/DShanMCU-F103/chapter7.html)
+#### [4-2] 内存管理  
+[参考文档](https://rtos.100ask.net/zh/freeRTOS/DShanMCU-F103/chapter8.html)
+
+
 
 
 
