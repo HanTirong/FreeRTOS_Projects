@@ -68,24 +68,24 @@ void MX_FREERTOS_Init(void) {
      - 如果最高优先级的任务有多个，它们轮流运行
 2. 程序用**链表**来管理任务  
 - 变量 *pxReadyTasksLists[configMAX_PRIORITIES]* 中第N个成员存储了优先级为N的处于Ready/Running状态的任务
-- vTaskStartScheduler()函数中会创建一个空闲任务prvIdleTask ，该任务优先级为0
-- 有一个全局变量 pxCurrentTCB，每当创建好一个任务，会指向此时优先级最高的任务；若创建了多个优先级相同的任务，则指向最后一个创建的任务
-- 定义 TICK_RATE_HZ 为Tick中断频率，在Tick中断中会进行计数累加，以及调度（遍历ReadList，从高优先级到低优先级遍历，找到第一个非空的链表，把pxCurrentTCB指向下一个任务，来启动它）
-- 当调用vTaskDelay()，任务进入阻塞状态，此时该任务会从ReadyList删除，被存入某个DelayedTaskList，然后触发调度
-- 假设vTaskDelay(2)，即需要等待2个Tick，当时间到了以后，在tick中断中除了计数之外，还会判断DelayedTaskList中的任务是否可以被恢复，如果可以则放回到Readlist中，然后进行调度
-- 当调用vTaskSuspend()，任务会被移动到SuspendList
-- 当调用vTaskResume()，任务会被移动到Readylist
+- `vTaskStartScheduler()`函数中会创建一个空闲任务 *prvIdleTask* ，该任务优先级为0
+- 有一个全局变量 *pxCurrentTCB* ，每当创建好一个任务，会指向此时优先级最高的任务；若创建了多个优先级相同的任务，则指向最后一个创建的任务
+- 定义 *TICK_RATE_HZ* 为Tick中断频率，在Tick中断中会进行计数累加，以及调度（遍历ReadList，从高优先级到低优先级遍历，找到第一个非空的链表，把 *pxCurrentTCB* 指向下一个任务，来启动它）
+- 当调用`vTaskDelay()`，任务进入阻塞状态，此时该任务会从 *ReadyList* 删除，被存入某个 *DelayedTaskList* ，然后触发调度
+- 假设`vTaskDelay(2)`，即需要等待2个Tick，当时间到了以后，在tick中断中除了计数之外，还会判断 *DelayedTaskList* 中的任务是否可以被恢复，如果可以则放回到Readlist中，然后进行调度
+- 当调用`vTaskSuspend()`，任务会被移动到 *SuspendList*
+- 当调用`vTaskResume()`，任务会被移动到 *Readylist*
 #### [5-5-3] 空闲任务  
-1. 如果一个任务函数不经过其他处理，执行完了直接返回的话，会进入到prvTaskExitError()，该函数内部会关闭所有的中断，导致所有的任务不再可以运行
+1. 如果一个任务函数不经过其他处理，执行完了直接返回的话，会进入到`prvTaskExitError()`，该函数内部会关闭所有的中断，导致所有的任务不再可以运行
 2. 任务如何退出？
-   - 自杀：vTaskDelete(NULL)，自杀完，由空闲任务去释放资源，回收栈和TCB
-   - 他杀： vTaskDelete(&TaskHandle)，谁杀的，就由谁去释放资源，回收栈和TCB
+   - 自杀：`vTaskDelete(NULL)`，自杀完，由空闲任务去释放资源，回收栈和TCB
+   - 他杀： `vTaskDelete(&TaskHandle)`，谁杀的，就由谁去释放资源，回收栈和TCB
    - 如果有很多个任务自杀，空闲任务根本无法去回收栈和TCB，有可能导致内存不足
 3. 因此，要有良好的编程习惯
    - 事件驱动，例如按下某个按键，再执行某个函数
-   - 休眠时，延时函数不要使用，例如不要用mdelay()，改为vTaskDelay()
+   - 休眠时，延时函数不要使用，例如不要用`mdelay()`，改为`vTaskDelay()`
 #### [5-6] 两个delay函数   
- 1. vTaskDelay() 至少等待指定个数的tick后才变为就绪状态
- 2. vTaskDelayUntil(&preTime, tickCounts) 等到指定的绝对时刻，才能变为就绪态
-   - 在该函数中，计时到了以后，除了会更新被唤醒的时间preTime + tickCounts，还会让该任务进入就绪态
+ 1. `vTaskDelay()` 至少等待指定个数的tick后才变为就绪状态
+ 2. `vTaskDelayUntil(&preTime, tickCounts)` 等到指定的绝对时刻，才能变为就绪态
+    - 在该函数中，计时到了以后，除了会更新被唤醒的时间preTime + tickCounts，还会让该任务进入就绪态
 ---
