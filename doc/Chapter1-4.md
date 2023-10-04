@@ -56,7 +56,8 @@
 2. 栈  
   也是一块空闲内存，CPU中的SP寄存器纸箱它吗，可用于函数调用、局部变量、多任务系统里保存现场。  
   - 如何在MDK中生成反汇编？  
-    `option` -> `User` -> `After Build/Rebuild` -> 勾选Run#1，并输入`romelf --text -a -c  --output=xxx.dis yyy.axf`，其中xxx是自定义生成的反汇编文件的名称; yyy是编译生成的axf文件存在的路径，在 `Linker`->`Linker control string` 中查看最后-o 所配置的参数。  
+    `option` -> `User` -> `After Build/Rebuild` -> 勾选Run#1，并输入`romelf --text -a -c  --output=xxx.dis yyy.axf`，其中xxx是自定义生成的反汇编文件的名称; yyy是编译生成的axf文件存在的路径，在 `Linker`->`Linker control string` 中查看最后-o 所配置的参数，  如下图所示：
+    ![反汇编生成](./fig/12_keil_dis.png)  
   - 在C语言的函数入口处，先划分出自己的栈，然后保存LR寄存器里面的值进栈，还会保存局部变量  
     - ***如何保存局部变量？*** `volatile`会让变量保存在栈里，如果不加此关键字，编译器可能会将变量优化，保存在寄存器中；但是如果变量太多，寄存器不够用时，一定会有变量存在栈中。
     - ***在RTOS中，为什么每个任务都要有自己的栈？*** 因为每个任务都有自己的调用关系、自己的局部变量、在进行调度时要**保存现场**（保存现场：将所有的寄存器的值存入该任务对应的栈中）

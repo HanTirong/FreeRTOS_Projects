@@ -34,6 +34,12 @@ MDK5/09_task_suspend/*
 
 MDK5/11_task_delay/*
 !MDK5/11_task_delay/Core/
+
+MDK5/12_task_sync_exclusion/*
+!MDK5/12_task_sync_exclusion/Core/
+MDK5/12_task_sync_exclusion/Core/Inc/*
+MDK5/12_task_sync_exclusion/Core/Src/*
+!MDK5/12_task_sync_exclusion/Core/Src/freertos.c
 # 忽视所有 .格式 的文件
 *.bat
 *.ioc
