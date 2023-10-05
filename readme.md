@@ -8,4 +8,5 @@
 ###  [Chapter 1~4](./doc/Chapter1-4.md)
 ###  [Chapter 5](./doc/Chapter5.md)  
 ###  [Chapter 6](./doc/Chapter6.md)
+###  [Chapter 8](./doc/Chapter8.md)
 ---
