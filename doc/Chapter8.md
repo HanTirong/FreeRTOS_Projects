@@ -76,10 +76,19 @@ void Read(uint8_t *val){
 
 
 
-
+### *2023.10.6*  
 
 #### [8-2-1] 队列实验-多设备玩游戏（思路）
-
+- 现有程序里一共两个任务：控制小球移动和控制挡球板移动
+- 现有程序控制挡球板任务是 红外遥控器的读取函数`IRReceiver_Read()` 读取环形buffer，每读取到一次数据挡球板会移动一次，如果想要移动的快就需要读取到多次数据；而环形buf中的数据是在红外遥控器的中断回调函数中写入的 `IRReceiver_IRQ_Callback()`
+- 现有程序要改为用队列去代替环形buf
+  - 在 `IRReceiver_IRQ_Callback()` 中去写队列A
+  - 在 `IRReceiver_Read()` 中去读队列A
+  - 引入另一种控制球挡板的方法，即旋转编码器，因此在 `RotaryEncoder_IRQ_Callback()` 中写队列B
+  - 新建一个 `RotaryEncoderTask()`，该任务中去读队列B，然后将读取的数据进行处理，处理完毕后再写入队列A
+    - 处理1：分辨旋转速度
+    - 处理2：根据旋转速度决定往队列A中写多少个数据；速度快就多写一点数据，速度慢就少写一点数据
+  
 
 
 
@@ -87,19 +96,83 @@ void Read(uint8_t *val){
 
 #### [8-2-2] 队列实验-多设备玩游戏（红外）
 
+- `xQueueCreate()`
+  - 动态分配，除了构建环形buf，还会构建一个结构体，用来管理环形buf；最终结构体作为handle被返回
+- `xQueueCreateStatic()`
 
+相关代码：[13_queue_game](../MDK5/13_queue_game/nwatch/game1.c) 
 
+``` txt
+代码逻辑：
+------------------  
+game1.c
+|--- xTaskCreate(playMusic_task)
+|--- xTaskCreate(game1_task)
+                    |--- xQueueCreate(g_xQueuePlatform)    -----------------------------|
+                    |--- xQueueCreateStatic(g_xQueueRotary)                             |
+                    |--- xTaskCreate(platform_task)                                     |
+                                        |--- xQueueReceive(g_xQueuePlatform)  ---read---|
+------------------                                                                      |
+driver_ir_receiver.c                                                                    |
+|--- IRReceiver_IRQ_callback()                                                          |
+        |--- xQueueSendToBackFromISR(g_xQueuePlatform)  -------------- write -----------|  // 如果是重复码
+        |--- IRReceiver_IRQTimes_Parse()                                                |
+                |--- xQueueSendToBackFromISR(g_xQueuePlatform)  ------ write -----------|   
 
+```
 
 
 #### [8-2-3] 队列实验--多设备玩游戏（旋转编码器）
 
+相关代码：[14_queue_game_multi_input](../MDK5/14_queue_game_multi_input/) 
 
+``` txt
+代码逻辑：
+---------------------------------    
+game1.c
+|--- xTaskCreate(playMusic_task)
+|--- xTaskCreate(game1_task)
+                    |--- xQueueCreate(g_xQueuePlatform) -------------------------------------|
+                    |--- xQueueCreateStatic(g_xQueueRotary)  --------------------------|     |
+                    |--- xTaskCreate(platform_task)                                    |     |
+                                        |--- xQueueReceive(g_xQueuePlatform)  --- read-|---<-|
+                    |--- xTaskCreate(RotaryEncoder_task)                               |     |
+                                        |--- xQueueReceive(g_xQueueRotary) --- read -<-|     |  // 从队列B取数，
+                                        |---   /*Process data*/                        |     |  // 然后处理后转为应用层相关的数据，
+                                        |--- xQueueSend(g_xQueuePlatform) --- write ---|--->-|  // 存入队列A
+                                                                                       |     | 
+                                                                                       |     |
+driver_ir_receiver.c                                                                   |     |
+|--- IRReceiver_IRQ_callback()                                                         |     |
+        |--- xQueueSendToBackFromISR(g_xQueuePlatform)  -------------- write ----------|--->-|  // 如果是重复码
+        |--- IRReceiver_IRQTimes_Parse()                                               |     |
+                |--- xQueueSendToBackFromISR(g_xQueuePlatform)  ------ write ----------|--->-|  // 把红外遥控器的键值转为游戏控制的按键然后写入队列A
+                                                                                       | 
+                                                                                       |    
+                                                                                       |
+driver_rotary_encoder.c                                                                | 
+|--- RotaryEncoder_IRQ_Callback()                                                      |
+        |---xQueueSendFromISR(g_xQueueRotary)   -------------- write -->-->-->-->-->-->|        // 旋转编码器将硬件相关的数据写入队列B
 
+```
 
 
 #### [8-3-1] 队列集实验-改进程序框架（思路）
-
+-  参考代码14的逻辑图，可以得出：旋转编码器的架构更为合理，将硬件层的数据与应用层的数据分开进行处理。但是这种做法也是有缺陷的，今后每添加一个硬件，就得创建一个任务函数去转换硬件层的数据到应用层的数据，这样会造成资源浪费。
+-  改进：假设每个硬件都是在其中断函数中将硬件数据去写入到各自的队列B；构造一个任务InputTask对所有硬件的队列B进行读取，然后转化为应用层的数据并写入队列A。
+   -  问题：InputTask如何及时地读到各个硬件对应的队列B中的数据呢？
+      -  轮询
+      -  队列集：也是一个队列，里面存放的元素是队列的句柄；举例说明，内部机制如下：
+           1. 创建 队列A、队列B
+           2. 创建队列集S
+           3. 队列A和B 与 队列集S建立联系
+           4. 往队列A或B写入数据时，顺便会把队列A或B的句柄写入到队列集S中
+           5. 因此在 InputTask 中会读取S得到队列的句柄
+           6. 然后通过读取队列句柄得到数据
+- 因此，改进后的框架为： 
+  1. 假设每个硬件在其中断函数中将硬件数据写入到队列B中；
+  2.  每个硬件存放硬件数据的队列B都被加入到队列集S中；
+  3.  在InputTask中，读取队列集S得到队列的句柄，然后读取队列得到硬件数据，最后将硬件数据转换成应用层数据写入队列A
 
 
 
