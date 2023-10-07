@@ -124,7 +124,7 @@ driver_ir_receiver.c                                                            
 
 #### [8-2-3] 队列实验--多设备玩游戏（旋转编码器）
 
-相关代码：[14_queue_game_multi_input](../MDK5/14_queue_game_multi_input/) 
+相关代码：[14_queue_game_multi_input](../MDK5/14_queue_game_multi_input/nwatch/game1.c) 
 
 ``` txt
 代码逻辑：
@@ -178,8 +178,52 @@ driver_rotary_encoder.c                                                         
 
 
 #### [8-3-2] 队列集实验-改进程序框架（编程）
+相关代码：[15_queueset_game](../MDK5/15_queueset_game/nwatch/game1.c) 
+``` txt
+代码逻辑：
+---------------------------------    
+freertos.c
+|--- MX_FREERTOS_Init()
+        |---IRReceiver_Init()
+                |--- xQueueCreate(g_xQueueIR) ----------/*1. crerate queue*/--------------------|   
+        |---RotaryEncoder_Init()                                                                |
+                |--- xQueueCreate(g_xQueueRotary) -------------------------------------|        |
+                                                                                       |        |
+game1.c                                                                                |        | 
+|--- xTaskCreate(game1_task)                                                           |        | 
+                    |--- xQueueCreate(g_xQueuePlatform)                                |        | 
+                    |--- xQueueCreateSet(g_xQueueSetInput)                             |        | 
+                    |--- xTaskCreate(Input_task)                                       |        |         
+                            |--- xQueueSelectFromSet(g_xQueueSetInput, portMAX_DELAY); |        |     // 从队列集中读取有数据的队列句柄       
+                            |--- ProcessIRData();                                      |        |     //如果是红外的队列，
+                                    |--- xQueueReceive(g_xQueueIR) ---- 5. read--------|<--<--<-| 
+                                    |--- /* process data*/                             |        |     //  将硬件数据转换成应用层数据
+                                    |--- xQueueSend(g_xQueuePlatform)                  |        |     //  写入应用层队列中
+                            |--- ProcessRotaryData();                                  |        |     //  如果是旋转编码器的队列，
+                                    |--- xQueueReceive(g_xQueueRotary) --read-<--<--<--|        |
+                                    |--- /* process data*/                             |        | 
+                                    |--- xQueueSend(g_xQueuePlatform)                  |        |          
+                    |--- g_xQueueRotary = GetQueueRotary()   --------------------------|        |                             
+                    |--- g_xQueueIR = GetQueueIR() --------/*2. get queue*/------------|        | 
+                    |--- xQueueAddToSet(g_xQueueIR, g_xQueueSetInput); --- 3.----------|        | 
+	                |--- xQueueAddToSet(g_xQueueRotary, g_xQueueSetInput); ------------|        |         
+                    |--- xTaskCreate(platform_task)                                    |        | 
+                            |--- xQueueReceive(g_xQueuePlatform)                       |        |     // 读取应用层队列中的数据
+                                                                                       |        |                                                                                     
+                                                                                       |        | 
+driver_ir_receiver.c                                                                   |        |              
+|--- IRReceiver_IRQ_callback()                                                         |        |     
+        |--- xQueueSendToBackFromISR(g_xQueueIR)  ----------- 4. write ----------------|->-->-->|  // 如果是重复码
+        |--- IRReceiver_IRQTimes_Parse()                                               |        |     
+                |--- xQueueSendToBackFromISR(g_xQueueIR)  ---- 4. write ---------------|->-->-->|// 把红外遥控器的键值转为游戏控制的按键然后写入队列A
+                                                                                       |         
+                                                                                       |    
+                                                                                       |
+driver_rotary_encoder.c                                                                | 
+|--- RotaryEncoder_IRQ_Callback()                                                      |
+        |---xQueueSendFromISR(g_xQueueRotary)  --------------- write -->-->-->-->-->-->|        // 旋转编码器将硬件相关的数据写入队列B
 
-
+```
 
 
 
