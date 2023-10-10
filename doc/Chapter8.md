@@ -188,7 +188,7 @@ freertos.c
                 |--- xQueueCreate(g_xQueueIR) ----------/*1. crerate queue*/--------------------|   
         |---RotaryEncoder_Init()                                                                |
                 |--- xQueueCreate(g_xQueueRotary) -------------------------------------|        |
-                                                                                       |        |
+        |--- xTaskCreate(game1_task)                                                    |        |
 game1.c                                                                                |        | 
 |--- xTaskCreate(game1_task)                                                           |        | 
                     |--- xQueueCreate(g_xQueuePlatform)                                |        | 
@@ -240,8 +240,32 @@ driver_rotary_encoder.c                                                         
 
 
 #### [8-4] 队列实验-分发数据给多个任务（赛车游戏）
+相关代码：[17_queueset_car_dispatch_htr](../MDK5/17_queueset_car_dispatch_htr/nwatch/game2.c 
+
+```
+代码逻辑：
+----------------------------------------------
+freertos.c
+|--- MX_FREERTOS_Init()
+        |--- IRReceiver_Init();
+                |--- xQueueCreate(g_xQueueIR)    -------------------------------------------------------------------|
+        |--- xTaskCreate(car_game)                                                                                  |
+                            |--- xQueueCreate(g_xQueueCar)  ----------------------------------------|---------------|
+                            |--- xTaskCreate(input_car_task)                                        |               |
+                                                |--- xQueueReceive(g_xQueueIR)      ----------------|------read-<-<-|
+                                                |--- /*process hardware data to app data*/          |               |
+                                                |--- xQueueSendToBack(g_xQueueCar)  ---- write- ->->|               |
+                                                                                                    |               |
+                                                                                                    |               |
+                            |--- /*init car and road*/                                              |               |
+                            |--- while(1)                                                           |               |
+                                    |--- /*draw road*/                                              |               |
+                                    |--- xQueueReceive(g_xQueueCar) ------------------ read ----<-<-|               |
+                                    |--- /*move car*/                                                               |
+                                                                                                                    |
+driver_ir_receiver.c                                                                                                |
+|--- IRReceiver_IRQTimes_Parse()                                                                                    |
+        |---xQueueSendToBackFromISR(g_xQueueIR)     ------------------------------------------------------ write->->|
 
 
-
-
-
+```
