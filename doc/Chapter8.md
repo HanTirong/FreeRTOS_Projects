@@ -240,7 +240,7 @@ driver_rotary_encoder.c                                                         
 
 
 #### [8-4] 队列实验-分发数据给多个任务（赛车游戏）
-相关代码：[17_queueset_car_dispatch_htr](../MDK5/17_queueset_car_dispatch_htr/nwatch/game2.c 
+相关代码：[17_queueset_car_dispatch_htr](../MDK5/17_queueset_car_dispatch_htr/nwatch/game2.c )
 
 ```
 代码逻辑：
