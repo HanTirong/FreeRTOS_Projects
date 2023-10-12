@@ -6,8 +6,9 @@
 
 ---
 ###  [Chapter 1~4](./doc/Chapter1-4.md)
-###  [Chapter 5](./doc/Chapter5.md)  
-###  [Chapter 6](./doc/Chapter6.md)
-###  [Chapter 8](./doc/Chapter8.md)
-###  [Chapter 9](./doc/Chapter9.md)
+###  [任务管理](./doc/Chapter5.md)  
+###  [同步互斥与通信](./doc/Chapter6.md)
+###  [队列与队列集](./doc/Chapter8.md)
+###  [信号量与互斥量](./doc/Chapter9.md)
+###  [事件组](./doc/Chapter10.md)
 ---

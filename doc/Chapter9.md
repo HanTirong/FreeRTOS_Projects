@@ -38,7 +38,7 @@
     1. 如果收到，cnt--
     2. 如果没有收到，就阻塞，即将自己放入recvList中
    
-
+---  
 #### [9-2-1] 信号量实验——控制车辆运行
 
 相关代码：[18_semaphore_not_use](../MDK5/18_semaphore_not_use/nwatch/game2.c) 
@@ -60,7 +60,7 @@
 
 
 
-
+---  
 
 #### [9-2-2] 信号量实验——优先级反转
 相关代码：[21_semaphore_priority_inversion](../MDK5/21_semaphore_priority_inversion/nwatch/game2.c)   
@@ -84,7 +84,7 @@
 
 
 
-
+---  
 
 
 
