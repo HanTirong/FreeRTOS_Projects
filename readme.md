@@ -11,4 +11,5 @@
 ###  [队列与队列集](./doc/Chapter8.md)
 ###  [信号量与互斥量](./doc/Chapter9.md)
 ###  [事件组](./doc/Chapter10.md)
+###  [任务通知](./doc/Chapter11.md)
 ---
