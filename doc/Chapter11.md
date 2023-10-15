@@ -35,13 +35,13 @@ typedef struct tskTaskControlBlock
 任务A:    ...   -> (3)发送通知，但是无法唤醒B ->  ...  
 ```
 
-任务B的通知状态：
-（1） taskNOT_WAITING_NOTIFICATION
-（2） taskNOT_WAITING_NOTIFICATION
-（3） taskNOTIFICATION_RECEIVED 即使状态改变也不被唤醒
-（4） taskNOTIFICATION_RECEIVED
-（5） taskNOTIFICATION_RECEIVED 
-（6） taskNOT_WAITING_NOTIFICATION 恢复初始状态
+任务B的通知状态：  
+（1） taskNOT_WAITING_NOTIFICATION  
+（2） taskNOT_WAITING_NOTIFICATION  
+（3） taskNOTIFICATION_RECEIVED 即使状态改变也不被唤醒  
+（4） taskNOTIFICATION_RECEIVED  
+（5） taskNOTIFICATION_RECEIVED   
+（6） taskNOT_WAITING_NOTIFICATION 恢复初始状态  
  
 
 
@@ -51,11 +51,11 @@ typedef struct tskTaskControlBlock
 任务B: (1)运行 -> (2)阻塞（因为等待通知） -> (4)运行
 任务A:   ....   -> (3)发送通知，唤醒B  ->  ...   
 ```
-任务B的通知状态：
-（1） taskNOT_WAITING_NOTIFICATION
-（2） taskWAITING_NOTIFICATION
-（3） taskNOTIFICATION_RECEIVED
-（4） taskNOT_WAITING_NOTIFICATION 又恢复成初始状态
+任务B的通知状态：  
+（1） taskNOT_WAITING_NOTIFICATION  
+（2） taskWAITING_NOTIFICATION  
+（3） taskNOTIFICATION_RECEIVED  
+（4） taskNOT_WAITING_NOTIFICATION 又恢复成初始状态  
 
 
 

@@ -12,4 +12,5 @@
 ###  [信号量与互斥量](./doc/Chapter9.md)
 ###  [事件组](./doc/Chapter10.md)
 ###  [任务通知](./doc/Chapter11.md)
+###  [软件定时器](./doc/Chapter12.md)
 ---
