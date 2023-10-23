@@ -13,4 +13,6 @@
 ###  [事件组](./doc/Chapter10.md)
 ###  [任务通知](./doc/Chapter11.md)
 ###  [软件定时器](./doc/Chapter12.md)
+###  [中断管理](./doc/Chapter13.md)
+###  [资源管理](./doc/Chapter14.md)
 ---
