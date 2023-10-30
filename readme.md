@@ -15,4 +15,5 @@
 ###  [软件定时器](./doc/Chapter12.md)
 ###  [中断管理](./doc/Chapter13.md)
 ###  [资源管理](./doc/Chapter14.md)
+###  [优化系统](./doc/Chapter15.md)
 ---
